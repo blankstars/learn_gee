@@ -1,7 +1,4 @@
-module learn_gee
+module github.com/blankstars/learn_gee
 
 go 1.19
 
-require gee v0.0.0
-
-replace gee => ./gee
