@@ -8,7 +8,7 @@ import (
 func main() {
 	r := gee.New()
 
-	r.Use(gee.Logger())
+	r.Use(gee.Logger(), gee.Recovery())
 
 	r.Get("/", func(c *gee.Context) {
 		c.String(http.StatusOK, "hello world: %v", c.Path)
@@ -35,6 +35,11 @@ func main() {
 
 	r.Get("/index", func(c *gee.Context) {
 		c.HTML(http.StatusOK, "css.tmpl", nil)
+	})
+
+	r.Get("/panic", func(c *gee.Context) {
+		var names []string
+		c.String(http.StatusOK, names[0])
 	})
 
 	r.Run(":8080")
