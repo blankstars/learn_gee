@@ -7,23 +7,16 @@ import (
 type HandlerFunc func(*Context)
 
 type Engine struct {
+	*RouterGroup
 	router *router
+	groups []*RouterGroup // store all groups
 }
 
 func New() *Engine {
-	return &Engine{router: newRouter()}
-}
-
-func (e *Engine) addRoute(method string, pattern string, handler HandlerFunc) {
-	e.router.addRoute(method, pattern, handler)
-}
-
-func (e *Engine) Get(pattern string, handler HandlerFunc) {
-	e.router.addRoute("GET", pattern, handler)
-}
-
-func (e *Engine) Post(pattern string, handler HandlerFunc) {
-	e.router.addRoute("POST", pattern, handler)
+	engine := &Engine{router: newRouter()}
+	engine.RouterGroup = &RouterGroup{engine: engine}
+	engine.groups = []*RouterGroup{engine.RouterGroup}
+	return engine
 }
 
 func (e *Engine) Run(address string) error {
@@ -33,4 +26,35 @@ func (e *Engine) Run(address string) error {
 func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	c := newContext(w, req)
 	e.router.handle(c)
+}
+
+type RouterGroup struct {
+	prefix      string
+	middlewares []HandlerFunc // support middleware
+	parent      *RouterGroup  // support nesting
+	engine      *Engine       // all group share a Engine instance
+}
+
+func (g *RouterGroup) Group(prefix string) *RouterGroup {
+	engine := g.engine
+	newGroup := &RouterGroup{
+		prefix: g.prefix + prefix,
+		parent: g,
+		engine: engine,
+	}
+	engine.groups = append(engine.groups, newGroup)
+	return newGroup
+}
+
+func (g *RouterGroup) addRoute(method string, comp string, handler HandlerFunc) {
+	pattern := g.prefix + comp
+	g.engine.router.addRoute(method, pattern, handler)
+}
+
+func (g *RouterGroup) Get(pattern string, handler HandlerFunc) {
+	g.addRoute("GET", pattern, handler)
+}
+
+func (g *RouterGroup) Post(pattern string, handler HandlerFunc) {
+	g.addRoute("POST", pattern, handler)
 }

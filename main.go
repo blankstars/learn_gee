@@ -27,7 +27,9 @@ func main() {
 
 	})
 
-	r.Post("/assets/*filepath", func(c *gee.Context) {
+	g := r.Group("/assets")
+
+	g.Post("/*filepath", func(c *gee.Context) {
 		c.JSON(http.StatusOK, gee.H{
 			"filepath": c.Param("filepath"),
 		})
