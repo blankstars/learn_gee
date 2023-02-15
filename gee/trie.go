@@ -22,7 +22,7 @@ func (n *node) insert(pattern string, parts []string, height int) {
 		n.children = append(n.children, child)
 	}
 
-	n.insert(pattern, parts, height+1)
+	child.insert(pattern, parts, height+1)
 }
 
 func (n *node) search(parts []string, height int) *node {

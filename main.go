@@ -19,5 +19,13 @@ func main() {
 
 	})
 
+	r.Post("/hi/:name", func(c *gee.Context) {
+		c.JSON(http.StatusOK, gee.H{
+			"username": c.Param("name"),
+			"password": c.PostForm("password"),
+		})
+
+	})
+
 	r.Run(":8080")
 }
