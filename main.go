@@ -7,6 +7,9 @@ import (
 
 func main() {
 	r := gee.New()
+
+	r.Use(gee.Logger())
+
 	r.Get("/", func(c *gee.Context) {
 		c.String(http.StatusOK, "hello world: %v", c.Path)
 	})
@@ -28,6 +31,7 @@ func main() {
 	})
 
 	g := r.Group("/assets")
+	g.Use(gee.Logger())
 
 	g.Post("/*filepath", func(c *gee.Context) {
 		c.JSON(http.StatusOK, gee.H{
