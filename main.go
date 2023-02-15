@@ -30,14 +30,11 @@ func main() {
 
 	})
 
-	g := r.Group("/assets")
-	g.Use(gee.Logger())
+	r.LoadHTMLGlob("templates/*")
+	r.Static("assets", "./static")
 
-	g.Post("/*filepath", func(c *gee.Context) {
-		c.JSON(http.StatusOK, gee.H{
-			"filepath": c.Param("filepath"),
-		})
-
+	r.Get("/index", func(c *gee.Context) {
+		c.HTML(http.StatusOK, "css.tmpl", nil)
 	})
 
 	r.Run(":8080")
